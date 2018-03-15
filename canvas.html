@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+    #vibrate { text-align: center; }
+  </style>
+  <title>Canvas</title>
+</head>
+<body>
+  <div class="sound-wrapper">
+    <h3>Sound Wave Emulation</h3>
+    <canvas id="sound" class="sound"></canvas>
+    <p id="vibrate"></p>
+  </div>
+  <script>
+    const RANGE = 30;
+    const MIN = 70;
+    var radius = 0;
+    var canvas = document.querySelector('#sound')
+    canvas.width = document.querySelector('.sound-wrapper').clientWidth
+    canvas.height = 300
+    var ctx = canvas.getContext('2d')
+    
+    var x = canvas.width / 2
+    var y = canvas.height / 2
+    
+
+    function randomRadius () {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      radius = MIN + Math.random() * RANGE
+      document.querySelector("#vibrate").textContent = radius
+      ctx.beginPath()
+      ctx.arc(x, y, radius, 0, 2 * Math.PI)
+      // ctx.stroke()
+
+      var grd = ctx.createRadialGradient(x, y, 0, x, y, radius)
+      grd.addColorStop(0, "red")
+      grd.addColorStop(1, "white")
+
+      ctx.fillStyle = grd
+      ctx.fill()
+    }
+
+    // randomRadius()
+    setInterval(randomRadius, 100)
+  </script>
+</body>
+</html>

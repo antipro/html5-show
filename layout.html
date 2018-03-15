@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    html { height: 100%; }
+    body { height: 100%; }
+    .side-modal, .top-bar, .main-bar { border: solid thin #000; padding: 5px; box-sizing: border-box; }
+
+    .side-modal { position: fixed; top: 0; left: -250px; bottom: 0; width: 250px; z-index: 1050; padding: 0; -webkit-transition: left 1s; transition: left 1s; }
+    .side-modal .left-bar { height: 100%; background-color: #f9f7f6; }
+    .top-bar { position: fixed; top: 0; left: 0; width: 100vw; height: 50px; overflow: hidden; -webkit-transition: left 1s; transition: left 1s; }
+    .main-bar { position: fixed; top: 50px; left: 0; width: 100vw; bottom: 0px; -webkit-transition: left 1s; transition: left 1s; }
+    .toggle-btn { display: inline; }
+    @media only screen and (min-width: 900px) {
+      .side-modal { position: fixed; top: 0; left: 0; bottom: 0; width: 250px; }
+      .top-bar { position: fixed; top: 0; left: 250px; right: 0; width: auto; height: 50px; }
+      .main-bar { position: fixed; top: 50px; left: 250px; right: 0px; width: auto; bottom: 0px; }
+      .toggle-btn { display: none; }
+    }
+
+    .side-modal-on { left: 0; width: auto; right: 0; background-color: rgba(52, 52, 52, 0.5) }
+    .left-bar-on { width: 250px; }
+    .top-bar-on, .main-bar-on { left: 250px; }
+    .input-bar { position: absolute; left: 0px; bottom: 0px; right: 0px; height: 50px; }
+    .input-bar > input { width: 100%; height: 100%; font-size: 22px; }
+  </style>
+  <script>
+  function toggle(){
+    let sideModal = document.querySelector('.side-modal')
+    let leftBar = document.querySelector('.left-bar')
+    let topBar = document.querySelector('.top-bar')
+    let mainBar = document.querySelector('.main-bar')
+    if(sideModal.classList.contains('side-modal-on')){
+      sideModal.classList.remove('side-modal-on')
+      leftBar.classList.remove('left-bar-on')
+      topBar.classList.remove('top-bar-on')
+      mainBar.classList.remove('main-bar-on')
+      sideModal.removeAttribute("onclick")
+    } else {
+      sideModal.classList.add('side-modal-on')
+      leftBar.classList.add('left-bar-on')
+      topBar.classList.add('top-bar-on')
+      mainBar.classList.add('main-bar-on')
+      sideModal.setAttribute("onclick", 'toggle()')
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="side-modal">
+    <div class="left-bar">
+        left-barleft-barleft-barleft-barleft-barleft-barleft-barleft-barleft-barleft-barleft-barleft-barleft-barleft-bar
+    </div>
+  </div>
+  <div class="top-bar">
+    <button class="toggle-btn" onclick="toggle()" on-touch="toggle()">右侧菜单</button>
+    top-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bartop-bar
+  </div>
+  <div class="main-bar">
+    <ul>
+      <li>A</li>
+      <li>B</li>
+      <li>C</li>
+      <li>D</li>
+      <li>E</li>
+    </ul>
+    main-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-barmain-bar
+    <div class="input-bar">
+      <input type="text" name="" id="">
+    </div>
+  </div>
+  <script>
+      if (window.innerWidth < 900) {
+        let sideModal = document.querySelector('.side-modal')
+        sideModal.setAttribute("onclick", 'toggle()')
+      }
+      window.addEventListener('resize', (evt) => {
+        if (window.innerWidth >= 900) {
+          let sideModal = document.querySelector('.side-modal')
+          let leftBar = document.querySelector('.left-bar')
+          let topBar = document.querySelector('.top-bar')
+          let mainBar = document.querySelector('.main-bar')
+          if(sideModal.classList.contains('side-modal-on')){
+            sideModal.classList.remove('side-modal-on')
+            leftBar.classList.remove('left-bar-on')
+            topBar.classList.remove('top-bar-on')
+            mainBar.classList.remove('main-bar-on')
+            sideModal.removeAttribute("onclick", 'toggle()')
+          }
+        }
+      })
+    </script>
+</body>
+</html>
