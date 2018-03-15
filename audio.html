@@ -8,15 +8,114 @@
   <title>Audio</title>
 </head>
 <body>
-  <audio controls>
-    <source src="https://www.quanzhanketang.com/html/horse.ogg" type="audio/ogg">
-    <source src="https://www.quanzhanketang.com/html/horse.mp3" type="audio/mp3">
+  <audio controls id="audio_player" src="music/horse.ogg">
     Your browser does not support the audio element.
   </audio>
-  <div>
-    <i class="material-icons">skip_previous</i>
-    <button><i class="material-icons">play_arrow</i></button>
-    <i class="material-icons">skip_next</i>
+  <style>
+    .control-bar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: rgb(2, 168, 243);
+      border-radius: 5px;
+    }
+    .btn {
+      display: inline-block; 
+      background: #FFF;
+      border-radius: 50%;
+      color: #383636;
+      margin: 3px;
+    }
+    .btn:active {
+      background-color: #a9b4b6;
+      transform: scale(1.2, 1.2);
+    }
+    .btn .material-icons {
+      color: #772b96;
+    }
+    .btn-play {
+      width: 48px;
+      height: 48px;
+    }
+    .btn-play .material-icons {
+      font-size: 36px;
+      margin: 6px;
+    }
+    .btn-previous, .btn-next {
+      width: 36px;
+      height: 36px;
+    }
+    .btn-previous .material-icons, .btn-next .material-icons {
+      font-size: 24px;
+      margin: 6px;
+    }
+    .progress-bar {
+      flex-grow: 1;
+      margin: 3px;
+      background-color: #FFF;
+      height: 5px;
+      border-radius: 2px;
+    }
+    .progress-bar .progress {
+      background-color: #772b96;
+      border-radius: 2px;
+      height: 100%;
+    }
+  </style>
+  <div class="control-bar">
+    <span class="btn btn-previous" role="button">
+      <i class="material-icons">&#xE045;</i>
+    </span>
+    <span class="btn btn-play">
+      <i class="material-icons">&#xE037;</i>
+    </span>
+    <span class="btn btn-next">
+      <i class="material-icons">&#xE044;</i>
+    </span>
+    <div class="progress-bar">
+      <div class="progress" style="width: 0%;"></div>
+    </div>
   </div>
+  <script>
+    var audioPlayer = document.querySelector("#audio_player");
+    var playBtn = document.querySelector('.btn-play');
+    document.querySelector('.progress-bar').addEventListener('click', function (evt) {
+      console.log(evt.currentTarget.clientWidth, evt.offsetX);
+      var percent = evt.offsetX / evt.currentTarget.clientWidth;
+      console.log(percent);
+      document.querySelector('.progress').style.width = percent * 100 + "%";
+      audioPlayer.currentTime = percent * audioPlayer.duration
+    });
+    document.querySelector('.btn-play').addEventListener('click', function (evt) {
+      var btn = this.querySelector('.material-icons');
+      var code = btn.textContent.charCodeAt(0)
+      if (code === 0xE034) {
+        btn.textContent = String.fromCharCode(0xE037);
+        audioPlayer.pause();
+        console.log('pause');
+      } else {
+        btn.textContent = String.fromCharCode(0xE034);
+        audioPlayer.play();
+        console.log('play');
+      }
+    });
+    document.querySelector('.btn-previous').addEventListener('click', function (evt) {
+      console.log('previous')
+    });
+    document.querySelector('.btn-next').addEventListener('click', function (evt) {
+      console.log('next')
+    });
+    audioPlayer.addEventListener('ended', function (evt) {
+      var btn = document.querySelector('.btn-play > .material-icons');
+      btn.textContent = String.fromCharCode(0xE037);
+      console.log('ended');
+    });
+    audioPlayer.addEventListener('timeupdate', function (evt) {
+      console.log(audioPlayer.currentTime, audioPlayer.duration)
+      var percent = audioPlayer.currentTime / audioPlayer.duration * 100;
+      console.log(percent);
+      document.querySelector('.progress').style.width = percent + "%";
+    });
+  </script>
 </body>
 </html>
