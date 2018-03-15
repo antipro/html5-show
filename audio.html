@@ -79,6 +79,7 @@
   <script>
     var audioPlayer = document.querySelector("#audio_player");
     var playBtn = document.querySelector('.btn-play');
+    // click event of progress bar
     document.querySelector('.progress-bar').addEventListener('click', function (evt) {
       console.log(evt.currentTarget.clientWidth, evt.offsetX);
       var percent = evt.offsetX / evt.currentTarget.clientWidth;
@@ -86,30 +87,35 @@
       document.querySelector('.progress').style.width = percent * 100 + "%";
       audioPlayer.currentTime = percent * audioPlayer.duration
     });
+    // click event of play/pause button
     document.querySelector('.btn-play').addEventListener('click', function (evt) {
       var btn = this.querySelector('.material-icons');
       var code = btn.textContent.charCodeAt(0)
-      if (code === 0xE034) {
+      if (code === 0xE034) { // pause while playing
         btn.textContent = String.fromCharCode(0xE037);
         audioPlayer.pause();
         console.log('pause');
-      } else {
+      } else { // play while pausing
         btn.textContent = String.fromCharCode(0xE034);
         audioPlayer.play();
         console.log('play');
       }
     });
+    // click event of previous button
     document.querySelector('.btn-previous').addEventListener('click', function (evt) {
       console.log('previous')
     });
+    // click event of next button
     document.querySelector('.btn-next').addEventListener('click', function (evt) {
       console.log('next')
     });
+    // end event of audio
     audioPlayer.addEventListener('ended', function (evt) {
       var btn = document.querySelector('.btn-play > .material-icons');
       btn.textContent = String.fromCharCode(0xE037);
       console.log('ended');
     });
+    // timeupdate event of audio
     audioPlayer.addEventListener('timeupdate', function (evt) {
       console.log(audioPlayer.currentTime, audioPlayer.duration)
       var percent = audioPlayer.currentTime / audioPlayer.duration * 100;
