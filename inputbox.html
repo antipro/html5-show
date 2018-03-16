@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="style.css">
+  <title>Input Box</title>
+</head>
+<body>
+  <style>
+    .input-group {
+      display: flex;
+      user-select: none;
+    }
+    .input-group input {
+      flex-grow: 1;
+    }
+    .input-group input:focus {
+      background-color: #ececec;
+    }
+    .btn {
+      display: inline-block;
+      color: #383636;
+      margin: 3px 5px;
+    }
+    .btn:active {
+      transform: scale(1.2, 1.2);
+    }
+    .btn .material-icons {
+      color: #772b96;
+    }
+  </style>
+  <div>
+    <h3>Input Box</h3>
+    <div class="input-group">
+      <input type="text" name="" id="">
+      <span class="btn">
+        <i class="material-icons">&#xE150;</i>
+      </span>
+    </div>
+  </div>
+</body>
+</html>
