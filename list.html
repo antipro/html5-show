@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="style.css">
+  <title>List</title>
+</head>
+<body>
+  <style>
+    .material-list {
+      padding: 0;
+    }
+    .material-list * {
+      font-size: 24px;
+      user-select: none;
+    }
+    .material-list > li {
+      display: flex;
+      align-items: center;
+      background-color: rgb(39, 99, 99);
+      color: white;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .material-list > li:hover {
+      background-color: #a351c5;
+    }
+    .material-list .tumbal {
+      display: flex;
+      margin-right: 6px;
+    }
+    .material-list .text {
+      flex-grow: 1;
+    }
+  </style>
+  <div>
+    <h3>Material Design</h3>
+    <ul class="material-list">
+      <li>
+        <div class="tumbal">
+          <i class="material-icons">&#xE2C7;</i>
+        </div>
+        <div class="text">Folder #1</div>
+      </li>
+      <li>
+        <div class="tumbal">
+          <i class="material-icons">&#xE2C7;</i>
+        </div>
+        <div class="text">Folder #2</div>
+      </li>
+      <li>
+        <div class="tumbal">
+          <i class="material-icons">&#xE2C7;</i>
+        </div>
+        <div class="text">Folder #3</div>
+      </li>
+      <li>
+        <div class="tumbal">
+          <i class="material-icons">&#xE2C7;</i>
+        </div>
+        <div class="text">Folder #4</div>
+      </li>
+      <li>
+        <div class="tumbal">
+          <i class="material-icons">&#xE2C7;</i>
+        </div>
+        <div class="text">Folder #5</div>
+      </li>
+    </ul>
+  </div>
+  <script>
+    document.querySelector('.material-list').addEventListener('click', (evt) => {
+      if (!evt.target.classList.contains('material-icons')) {
+        return;
+      }
+      var code = evt.target.textContent.charCodeAt(0)
+      if (code === 0xE2C7) {
+        document.querySelectorAll('.material-icons').forEach(element => {
+          element.textContent = String.fromCharCode(0xE2C7);
+        });
+        evt.target.textContent = String.fromCharCode(0xE5CA);
+      } else {
+        evt.target.textContent = String.fromCharCode(0xE2C7);
+      }
+    }, true);
+  </script>
+</body>
+</html>
