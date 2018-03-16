@@ -322,7 +322,7 @@
       -webkit-transform: translateX(-102%);
       transform: translateX(-102%);
       -webkit-transition: all ease 0.3s;
-      transition: -webkit-transform 0.3s;
+      transition: all ease 0.3s;
     }
 
     .side-nav__content--animatable {
@@ -745,7 +745,7 @@
     <h1 class="header__title">App Shell</h1>
   </header>
   <main class="main js-global-main" aria-role="main">
-
+    <button onclick="showMessage()">Show Message</button>
   </main>
 
   <aside class="toast-view js-toast-view">Message</aside>
@@ -776,6 +776,12 @@
   <aside class="toast-view js-toast-view">Message</aside>
 
   <script>
+    function showMessage () {
+      document.querySelector('.js-toast-view').classList.add('toast-view--visible');
+      setTimeout(function () {
+        document.querySelector('.js-toast-view').classList.remove('toast-view--visible');
+      }, 3000)
+    }
     document.querySelector('.js-toggle-menu').addEventListener('click', function (evt) {
       document.querySelector('.js-side-nav').classList.add('side-nav--visible');
       document.querySelector('.js-side-nav-content').style['-webkit-transform'] = 'translateX(0px)';
