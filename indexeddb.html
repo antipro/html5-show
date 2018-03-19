@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>IndexedDB</title>
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Url</th>
+      </tr>
+    </thead>
+    <tbody id="folder"></tbody>
+  </table>
+  <div>
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="name">
+    </div>
+    <div>
+      <label for="type">Type</label>
+      <select id="type">
+        <option value="0">Local</option>
+        <option value="1">Remote</option>
+      </select>
+    </div>
+    <div>
+      <label for="url">Url</label>
+      <input type="text" id="url">
+    </div>
+    <button onclick="saveFolder()">Save</button>
+  </div>
+  <script>
+    function saveFolder () {
+      var transaction = db.transaction([ "folders" ], "readwrite");
+      // report on the success of opening the transaction
+      transaction.oncomplete = function(event) {
+        console.log('Transaction completed: database modification finished.');
+        displayData();
+      };
+
+      transaction.onerror = function(event) {
+        console.log('Transaction not opened due to error. Duplicate items not allowed.');
+      };
+
+      var objectStore = transaction.objectStore("folders");
+      objectStore.add({
+        name: document.getElementById('name').value,
+        type: document.getElementById('type').value,
+        url: document.getElementById('url').value
+      })
+    }
+
+    function displayData () {
+      var folder = document.querySelector('#folder');
+      folder.innerHTML = '';
+
+      var transaction = db.transaction([ "folders" ], "readwrite");
+      // report on the success of opening the transaction
+      transaction.oncomplete = function(event) {
+        console.log('Transaction completed: database modification finished.');
+      };
+
+      transaction.onerror = function(event) {
+        console.log('Transaction not opened due to error. Duplicate items not allowed.');
+      };
+
+      var objectStore = transaction.objectStore("folders");
+      objectStore.openCursor().onsuccess = function(event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          folder.innerHTML += `<tr><td>${cursor.value.id}</td><td>${cursor.value.name}</td><td>${cursor.value.type}</td><td>${cursor.value.url}</td></tr>`;
+          cursor.continue();
+        }
+      }
+    }
+    
+    var db = null;
+    var request = window.indexedDB.open('musiclib', 1);
+    request.onerror = function (evt) {
+      console.log('Open Error!', evt);
+    };
+    request.onsuccess = function (evt) {
+      db = evt.target.result;
+      db.onerror = function(event) {
+        alert("Database error: " + event.target.errorCode);
+      };
+      displayData();
+    };
+
+    request.onupgradeneeded = function(event) { 
+      console.log('database upgrade');
+      db = event.target.result;
+      var objectStore = db.createObjectStore('folders', { keyPath: 'id', autoIncrement: true });
+      objectStore.createIndex("name", "name", { unique: false });
+      objectStore = db.createObjectStore('songs', { keyPath: 'id', autoIncrement: true });
+      objectStore.createIndex("name", "name", { unique: false });
+      objectStore.createIndex("fid", "fid", { unique: false });
+    };
+
+    
+  </script>
+</body>
+</html>
