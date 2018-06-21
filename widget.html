@@ -9,6 +9,9 @@
   <script type="text/javascript" src="http://webapi.amap.com/ui/1.0/main.js"></script>
   <title>Widget</title>
   <style>
+    /*
+    部分移动端浏览器下，由于导航栏可以收缩，所有容器元素必须为fixed position，且translateY不要多减10px。
+    */
     html { height: 100%; overflow: hidden; }
     body { height: 100%; overflow: hidden; }
     div.wrapper { position: relative; height: 100%; display: flex; flex-direction: column; align-items: stretch; overflow: auto; }
