@@ -9,11 +9,11 @@
   <script type="text/javascript" src="http://webapi.amap.com/ui/1.0/main.js"></script>
   <title>Widget</title>
   <style>
-    html { height: 100%; }
+    html { height: 100%; overflow: hidden; }
     body { height: 100%; overflow: hidden; }
-    div.wrapper { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; overflow: auto; }
+    div.wrapper { position: relative; height: 100%; display: flex; flex-direction: column; align-items: stretch; overflow: auto; }
     div.fixed-wrapper { overflow: hidden; }
-    div.widget { width: 80%; min-height: 100px; max-height: 100px; border: 1px solid #808080; box-shadow: 2px 2px #808080; margin: 10px 0; padding: 5px; z-index: 1000; 
+    div.widget { min-height: 100px; max-height: 100px; border: 1px solid #808080; box-shadow: 2px 2px #808080; margin: 10px; padding: 5px; z-index: 1000; 
       background-color: #cccaca; transition: transform 1s ease-in-out, opacity .5s ease; }
     div.widget button.save { display: none; }
     div.dismiss { opacity: 0; z-index: 999; }
@@ -78,8 +78,8 @@
     $$('.widget').forEach(ele => {
       if (ele == btn.parentNode) {
         ele.addEventListener('transitionend', edit_cb)
-        var offsetY = $('.wrapper').scrollTop + $('.wrapper').offsetHeight - ele.offsetTop - ele.scrollHeight
-        ele.style.transform = `translateY(${offsetY}px)`; 
+        var offsetY = $('.wrapper').scrollTop + $('.wrapper').offsetHeight - ele.offsetTop - ele.scrollHeight - 10
+        ele.style.transform = `translateY(${offsetY}px)`
         map = new AMap.Map('container',{
           zoom: 11,
           resizeEnable: true,
