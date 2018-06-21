@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="style.css">
+  <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.0&key=8d0f1cf7a6fcd36c234acec130e76c37"></script>
+  <script type="text/javascript" src="http://webapi.amap.com/ui/1.0/main.js"></script>
+  <title>Widget</title>
+  <style>
+    html { height: 100%; }
+    body { height: 100%; overflow: hidden; }
+    div.wrapper { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; overflow: auto; }
+    div.fixed-wrapper { overflow: hidden; }
+    div.widget { width: 80%; min-height: 100px; max-height: 100px; border: 1px solid #808080; box-shadow: 2px 2px #808080; margin: 10px 0; padding: 5px; z-index: 1000; 
+      background-color: #cccaca; transition: transform 1s ease-in-out, opacity .5s ease; }
+    div.widget button.save { display: none; }
+    div.dismiss { opacity: 0; z-index: 999; }
+    div.dismiss button { pointer-events: none; }
+    div.fixed { z-index: 1001; }
+    div.fixed button.edit { display: none; }
+    div.fixed button.save { display: inline; }
+    div#container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div id="container"></div>
+    <div class="widget">
+      1
+      <button class="edit" onclick="edit(this)">Edit</button>
+      <button class="save" onclick="save(this)">Save</button>
+    </div>
+    <div class="widget">
+      2
+      <button class="edit" onclick="edit(this)">Edit</button>
+      <button class="save" onclick="save(this)">Save</button>
+    </div>
+    <div class="widget">
+      3
+      <button class="edit" onclick="edit(this)">Edit</button>
+      <button class="save" onclick="save(this)">Save</button>
+    </div>
+    <div class="widget">
+      4
+      <button class="edit" onclick="edit(this)">Edit</button>
+      <button class="save" onclick="save(this)">Save</button>
+    </div>
+    <div class="widget">
+      5
+      <button class="edit" onclick="edit(this)">Edit</button>
+      <button class="save" onclick="save(this)">Save</button>
+    </div>
+    <div class="widget">
+      6
+      <button class="edit" onclick="edit(this)">Edit</button>
+      <button class="save" onclick="save(this)">Save</button>
+    </div>
+  </div>
+  <script>
+  const $ = function (selector) {
+    return document.querySelector(selector)
+  }
+  const $$ = function (selector) {
+    return document.querySelectorAll(selector)
+  }
+  
+  var map = null;
+
+  function edit_cb (evt) {
+    evt.target.classList.add('fixed')
+    $('.wrapper').classList.add('fixed-wrapper')
+    evt.target.removeEventListener('transitionend', edit_cb)
+  }
+
+  function edit (btn) {
+    $$('.widget').forEach(ele => {
+      if (ele == btn.parentNode) {
+        ele.addEventListener('transitionend', edit_cb)
+        var offsetY = $('.wrapper').scrollTop + $('.wrapper').offsetHeight - ele.offsetTop - ele.scrollHeight
+        ele.style.transform = `translateY(${offsetY}px)`; 
+        map = new AMap.Map('container',{
+          zoom: 11,
+          resizeEnable: true,
+          zooms: [3, 20],
+          expandZoomRange: true
+        })
+        return
+      }
+      ele.classList.add('dismiss')
+    })
+  }
+
+  function save_cb (evt) {
+    if (map) {
+      map.destroy()
+    }
+    $('#container').style.backgroundColor = '#FFF'
+    $$('.widget').forEach(ele => {
+      ele.classList.remove('dismiss')
+    })
+    evt.target.classList.remove('fixed')
+    $('.wrapper').classList.remove('fixed-wrapper')
+    evt.target.removeEventListener('transitionend', save_cb)
+  }
+
+  function save (btn) {
+    btn.parentNode.addEventListener('transitionend', save_cb)
+    btn.parentNode.style.transform = 'translateY(0)'
+  }
+  </script>
+</body>
+</html>
