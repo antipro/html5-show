@@ -14,7 +14,7 @@
 
     function onSuccess(stream) {
       var video = document.querySelector("#camera");
-      video.src = window.URL.createObjectURL(stream);
+      video.srcObject = stream;
       alert("success");
     }
 
