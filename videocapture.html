@@ -15,6 +15,7 @@
     function onSuccess(stream) {
       var video = document.querySelector("video");
       video.src = window.URL.createObjectURL(stream);
+      alert("success");
     }
 
     function onError(error) {
