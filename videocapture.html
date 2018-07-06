@@ -13,7 +13,7 @@
     var constraints = {video: true};
 
     function onSuccess(stream) {
-      var video = document.querySelector("video");
+      var video = document.querySelector("#camera");
       video.src = window.URL.createObjectURL(stream);
       alert("success");
     }
