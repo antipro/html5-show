@@ -16,6 +16,7 @@
       var video = document.querySelector("#camera");
       video.srcObject = stream;
       alert("success");
+      video.autoplay = true;
     }
 
     function onError(error) {
