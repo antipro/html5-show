@@ -12,16 +12,17 @@
 <body>
   <video id="camera"></video>
   <script>
+    var video = document.querySelector("#camera");
+    console.log(video.clientWidth)
     var constraints = {
       audio: true,
       video: {
-        width: 1920,
-        height: 1080
+        width: video.clientWidth,
+        height: video.clientHeight
       }
     };
 
     function onSuccess(stream) {
-      var video = document.querySelector("#camera");
       video.srcObject = stream;
       video.autoplay = true;
     }
