@@ -15,10 +15,9 @@
     var video = document.querySelector("#camera");
     console.log(video.clientWidth)
     var constraints = {
-      audio: true,
       video: {
-        width: video.clientWidth,
-        height: video.clientHeight
+        width: video.clientHeight,
+        height: video.clientWidth
       }
     };
 
