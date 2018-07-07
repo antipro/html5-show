@@ -12,7 +12,13 @@
 <body>
   <video id="camera"></video>
   <script>
-    var constraints = {video: true};
+    var constraints = {
+      audio: true,
+      video: {
+        width: { min: 1280 },
+        height: { min: 720 }
+      }
+    };
 
     function onSuccess(stream) {
       var video = document.querySelector("#camera");
