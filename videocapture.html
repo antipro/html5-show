@@ -5,14 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Vide Capture</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    #camera { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: red; }
+    #camera { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+    .control-bar { position: fixed; left: 0; width: 100%; bottom: 0; display: flex; flex-direction: row; justify-content: center; }
+    .control-bar * { font-size: 3em; }
   </style>
 </head>
 <body>
-  <video id="camera"></video>
+  <video id="camera" autoplay></video>
+  <div class="control-bar">
+    <i class="material-icons" id="videocam" onclick="startRecord()">videocam</i>
+    <i class="material-icons" id="videocam_off" onclick="stopRecord()" style="display: none;">videocam_off</i>
+  </div>
   <script>
     var video = document.querySelector("#camera");
+    var mediaRecorder = null;
     var constraints = {
       video: {
         width: video.clientHeight,
@@ -22,11 +30,34 @@
 
     function onSuccess(stream) {
       video.srcObject = stream;
-      video.autoplay = true;
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = function(e) {
+        console.log(e.data);
+      }
+
+      mediaRecorder.onstop = function(e) {
+        console.log("stoped");
+      }
     }
 
     function onError(error) {
       console.log("navigator.getUserMedia error: ", error);
+    }
+
+    function startRecord() {
+      mediaRecorder.start();
+      console.log(mediaRecorder.state);
+      console.log("recorder started");
+      document.querySelector("#videocam").style.display = "none";
+      document.querySelector("#videocam_off").style.display = "block";
+    }
+    function stopRecord() {
+      mediaRecorder.stop();
+      console.log(mediaRecorder.state);
+      console.log("recorder stopped");
+      document.querySelector("#videocam").style.display = "block";
+      document.querySelector("#videocam_off").style.display = "none;";
     }
 
     navigator.getUserMedia(constraints, onSuccess, onError);
