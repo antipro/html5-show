@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Edit DIV</title>
+  <style>
+    .edit-area {
+      width: 100%;
+      min-height: 100px;
+      background-color: rgb(255, 255, 255);
+      border: 1px solid #000;
+      word-break: break-all;
+      overflow-y: auto;
+      word-spacing: 5px;
+      font-size: 2em;
+      padding: 5px;
+    }
+    .edit-cursor {
+      display: inline-block;
+      margin: 0 3px;
+      width: 1px;
+      height: 32px;
+      border: 1px solid #000;
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="edit-area" tabindex="0">
+    <span class="edit-cursor"></span>
+  </div>
+  <script>
+    let div = document.querySelector('.edit-area');
+    div.addEventListener('click', ($event) => {
+      console.log($event);
+    });
+    div.addEventListener('keydown', ($event) => {
+      console.log($event.key);
+      let html = div.innerHTML;
+      switch($event.key) {
+        case 'Backspace':
+          html = html.substr(0, html.length - 1);
+          break;
+        case 'Enter':
+          html = html + "<br/>";
+          break;
+        default:
+          html += $event.key;
+      }
+      div.innerHTML = html;
+      // div.innerHTML += `<select>
+      //   <option>测试1</option>
+      //   <option>测试2</option>
+      //   <option>测试3</option>
+      // </select>`
+
+    });
+    div.addEventListener('focus', ($event) => {
+      console.log($event);
+    });
+
+    let cursor = document.querySelector('.edit-cursor');
+    setInterval(() => {
+      cursor.style.backgroundColor = cursor.style.backgroundColor == "rgb(255, 255, 255)" ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
+    }, 800);
+  </script>
+</body>
+</html>
