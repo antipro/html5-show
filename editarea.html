@@ -31,27 +31,40 @@
     }
     .edit-cursor-container {
       position: relative;
-      width: 0;
+      width: auto;
       height: 32px;
       border: none;
       margin: 0;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      border-bottom: 1px dashed #000;
     }
     .edit-cursor {
       position: absolute;
       top: 0;
-      left: 0;
+      right: 1px;
       height: 100%;
       border: 1px solid #000;
+    }
+    .br {
+      flex-basis: 100%;
+      width: 0px; 
+      height: 0px; 
+      overflow: hidden;
     }
   </style>
 </head>
 <body>
-  <div class="edit-area" tabindex="0" @keydown="onKeyDown">
-    <span v-if="cursorIdx == 0" class="edit-cursor-container">
+  <div class="edit-area" tabindex="0" @keydown.prevent="onKeyDown">
+    <span
+      v-if="cursorIdx == 0"
+      class="edit-cursor-container">
+      {{ phrase }}
       <span class="edit-cursor"></span>
     </span>
-    <template v-for="(data, $index) in datalist">
-      <span v-if="data.type == '1'">{{ data.value }}</span>
+    <template v-for="(data, $index) in explodedlist">
+      <span v-if="data.type == '1'" @click="setCursor($index, $event)">{{ data.value }}</span>
       <el-select v-if="data.type == '6'" v-model="data.dataValue">
         <el-option
           v-for="option in data.options"
@@ -59,14 +72,21 @@
           :label="option.dataText"
           :value="option.dataValue">
       </el-select>
-      <br v-if="data.type == '99'"/>
-      <span v-if="$index + 1 == cursorIdx" class="edit-cursor-container">
+      <div class="br" v-if="data.type == '99'">&nbsp;</div>
+      <span
+        v-if="$index + 1 == cursorIdx"
+        class="edit-cursor-container">
+        {{ phrase }}
         <span class="edit-cursor"></span>
       </span>
     </template>
   </div>
   <script>
     const datalist = [
+      {
+        type: '1',
+        value: '患者'
+      },
       {
         type: '6',
         dataValue: '1',
@@ -79,23 +99,58 @@
       {
         type: '1',
         value: '测试内容'
+      },
+      {
+        type: '6',
+        dataValue: '1',
+        options: [
+          { id: '1', dataText: '测试1', dataValue: '1' },
+          { id: '2', dataText: '测试2', dataValue: '2' },
+          { id: '3', dataText: '测试3', dataValue: '3' }
+        ]
       }
     ];
     const vueApp = new Vue({
       el: '.edit-area',
       data: {
+        phrase: '',
         datalist,
-        cursorIdx: datalist.length
+        cursorIdx: 0,
+        inIdx: 0
+      },
+      mounted () {
+        this.cursorIdx = this.explodedlist.length;
       },
       methods: {
         onKeyDown ($event) {
-          console.log($event.key);
+          console.log($event, this.dataIdx, this.inIdx);
           switch($event.key) {
             case 'Backspace':
+              if (this.phrase.length > 0) {
+                this.phrase = this.phrase.substr(0, this.phrase.length - 1);
+                break;
+              }
               if (this.cursorIdx != 0) {
-                datalist.splice(this.cursorIdx - 1, 1);
+                let data = this.datalist[this.dataIdx];
+                if (data.type == '1' && data.value.length > 1) {
+                  let chars = data.value.split('');
+                  chars.splice(this.inIdx, 1);
+                  data.value = chars.join('');
+                } else {
+                  this.datalist.splice(this.dataIdx, 1);
+                }
                 this.cursorIdx -= 1;
               }
+              break;
+            case 'Shift': // ignore
+              break;
+            case 'Control': // ignore
+              break;
+            case 'Alt': // ignore
+              break;
+            case 'ArrowUp':
+              break;
+            case 'ArrowDown':
               break;
             case 'ArrowLeft':
               this.cursorIdx -= 1;
@@ -103,21 +158,74 @@
               break;
             case 'ArrowRight':
               this.cursorIdx += 1;
-              if (this.cursorIdx > this.datalist.length) this.cursorIdx = this.datalist.length;
+              if (this.cursorIdx > this.explodedlist.length) this.cursorIdx = this.explodedlist.length;
               break;
             case 'Enter':
-              datalist.push({ type: '99' });
+              if (this.phrase.length == 0) {
+                this.datalist.push({ type: '99' });
+                this.cursorIdx += 1;
+              } else {
+                let data = this.datalist[this.dataIdx];
+                if (data && data.type == '1') {
+                  let chars = data.value.split('');
+                  chars.splice(this.inIdx + 1, 0, this.phrase);
+                  data.value = chars.join('');
+                } else {
+                  this.datalist.splice(this.dataIdx + 1, 0, { type: '1', value: this.phrase });
+                }
+                this.cursorIdx += this.phrase.length;
+              }
+              this.phrase = '';
               break;
             default:
-              datalist.splice(this.cursorIdx, 0, { type: '1', value: $event.key });
-              this.cursorIdx += 1;
+              this.phrase += $event.key;
           }
+        },
+        setCursor ($index, $event) {
+          this.phrase = '';
+          if ($event.offsetX > $event.target.scrollWidth / 2) {
+            this.cursorIdx = $index + 1;
+          } else {
+            this.cursorIdx = $index;
+          }
+        }
+      },
+      computed: {
+        explodedlist () {
+          let explodedlist = [];
+          this.datalist.forEach((data, idx) => {
+            if (data.type == '1') {
+              let chars = data.value.split('').map((char, charIdx) => {
+                return { type: '1', value: char, ref: data, charIdx };
+              });
+              explodedlist.push(...chars);
+            } else {
+              explodedlist.push(data);
+            }
+          });
+          return explodedlist;
+        },
+        dataIdx () {
+          let idx = 0;
+          return this.datalist.findIndex(data => {
+            let length;
+            if (data.type == '1') {
+              length = data.value.length;
+            } else {
+              length = 1;
+            }
+            idx += length;
+            if (idx >= this.cursorIdx) {
+              this.inIdx = length - (idx - this.cursorIdx) - 1
+              return true; 
+            };
+          });
         }
       },
       watch: {
         datalist: {
           handler () {
-            console.log(this.datalist);
+            // console.log(this.datalist);
           },
           deep: true
         }
