@@ -18,6 +18,7 @@
       border: 1px solid #000;
       word-break: break-all;
       overflow-y: auto;
+      overflow-x: hidden;
       font-size: 2em;
       padding: 5px;
       display: flex;
@@ -56,7 +57,11 @@
   </style>
 </head>
 <body>
-  <div class="edit-area" tabindex="0" @keydown.prevent="onKeyDown">
+  <div
+    class="edit-area"
+    tabindex="0"
+    @keyup="onKeyDown"
+    @click="onClick">
     <span
       v-if="cursorIdx == 0"
       class="edit-cursor-container">
@@ -78,6 +83,7 @@
         class="edit-cursor-container">
         {{ phrase }}
         <span class="edit-cursor"></span>
+        <input id="input" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; opacity: 0;">
       </span>
     </template>
   </div>
@@ -165,21 +171,24 @@
                 this.datalist.push({ type: '99' });
                 this.cursorIdx += 1;
               } else {
-                let data = this.datalist[this.dataIdx];
-                if (data && data.type == '1') {
-                  let chars = data.value.split('');
-                  chars.splice(this.inIdx + 1, 0, this.phrase);
-                  data.value = chars.join('');
-                } else {
-                  this.datalist.splice(this.dataIdx + 1, 0, { type: '1', value: this.phrase });
-                }
-                this.cursorIdx += this.phrase.length;
+                this.appendText();
               }
               this.phrase = '';
               break;
+            case ' ':
+              this.phrase = document.querySelector('#input').value;
+              document.querySelector('#input').value = "";
+              break;
+            // case 'Unidentified':
+            //   this.phrase = document.querySelector('#input').value;
+            //   document.querySelector('#input').value = "";
+            //   break;
             default:
               this.phrase += $event.key;
           }
+        },
+        onClick () {
+          document.querySelector('#input').focus();
         },
         setCursor ($index, $event) {
           this.phrase = '';
@@ -188,6 +197,17 @@
           } else {
             this.cursorIdx = $index;
           }
+        },
+        appendText () {
+          let data = this.datalist[this.dataIdx];
+          if (data && data.type == '1') {
+            let chars = data.value.split('');
+            chars.splice(this.inIdx + 1, 0, this.phrase);
+            data.value = chars.join('');
+          } else {
+            this.datalist.splice(this.dataIdx + 1, 0, { type: '1', value: this.phrase });
+          }
+          this.cursorIdx += this.phrase.length;
         }
       },
       computed: {
@@ -225,7 +245,7 @@
       watch: {
         datalist: {
           handler () {
-            // console.log(this.datalist);
+            console.log(this.datalist);
           },
           deep: true
         }
