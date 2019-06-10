@@ -4,67 +4,131 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdn.bootcss.com/vue/2.6.10/vue.js"></script>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <!-- 引入组件库 -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
   <title>Edit DIV</title>
   <style>
     .edit-area {
-      width: 100%;
+      width: 99%;
       min-height: 100px;
       background-color: rgb(255, 255, 255);
       border: 1px solid #000;
       word-break: break-all;
       overflow-y: auto;
-      word-spacing: 5px;
       font-size: 2em;
       padding: 5px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-wrap: wrap;
+      align-content: flex-start;
+    }
+    .edit-area > * {
+      margin: 1px;
+    }
+    .edit-cursor-container {
+      position: relative;
+      width: 0;
+      height: 32px;
+      border: none;
+      margin: 0;
     }
     .edit-cursor {
-      display: inline-block;
-      margin: 0 3px;
-      width: 1px;
-      height: 32px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
       border: 1px solid #000;
-      background-color: #000;
     }
   </style>
 </head>
 <body>
-  <div class="edit-area" tabindex="0">
-    <span class="edit-cursor"></span>
+  <div class="edit-area" tabindex="0" @keydown="onKeyDown">
+    <span v-if="cursorIdx == 0" class="edit-cursor-container">
+      <span class="edit-cursor"></span>
+    </span>
+    <template v-for="(data, $index) in datalist">
+      <span v-if="data.type == '1'">{{ data.value }}</span>
+      <el-select v-if="data.type == '6'" v-model="data.dataValue">
+        <el-option
+          v-for="option in data.options"
+          :key="option.id"
+          :label="option.dataText"
+          :value="option.dataValue">
+      </el-select>
+      <br v-if="data.type == '99'"/>
+      <span v-if="$index + 1 == cursorIdx" class="edit-cursor-container">
+        <span class="edit-cursor"></span>
+      </span>
+    </template>
   </div>
   <script>
-    let div = document.querySelector('.edit-area');
-    div.addEventListener('click', ($event) => {
-      console.log($event);
-    });
-    div.addEventListener('keydown', ($event) => {
-      console.log($event.key);
-      let html = div.innerHTML;
-      switch($event.key) {
-        case 'Backspace':
-          html = html.substr(0, html.length - 1);
-          break;
-        case 'Enter':
-          html = html + "<br/>";
-          break;
-        default:
-          html += $event.key;
+    const datalist = [
+      {
+        type: '6',
+        dataValue: '1',
+        options: [
+          { id: '1', dataText: '测试1', dataValue: '1' },
+          { id: '2', dataText: '测试2', dataValue: '2' },
+          { id: '3', dataText: '测试3', dataValue: '3' }
+        ]
+      },
+      {
+        type: '1',
+        value: '测试内容'
       }
-      div.innerHTML = html;
-      // div.innerHTML += `<select>
-      //   <option>测试1</option>
-      //   <option>测试2</option>
-      //   <option>测试3</option>
-      // </select>`
-
+    ];
+    const vueApp = new Vue({
+      el: '.edit-area',
+      data: {
+        datalist,
+        cursorIdx: datalist.length
+      },
+      methods: {
+        onKeyDown ($event) {
+          console.log($event.key);
+          switch($event.key) {
+            case 'Backspace':
+              if (this.cursorIdx != 0) {
+                datalist.splice(this.cursorIdx - 1, 1);
+                this.cursorIdx -= 1;
+              }
+              break;
+            case 'ArrowLeft':
+              this.cursorIdx -= 1;
+              if (this.cursorIdx < 0) this.cursorIdx = 0;
+              break;
+            case 'ArrowRight':
+              this.cursorIdx += 1;
+              if (this.cursorIdx > this.datalist.length) this.cursorIdx = this.datalist.length;
+              break;
+            case 'Enter':
+              datalist.push({ type: '99' });
+              break;
+            default:
+              datalist.splice(this.cursorIdx, 0, { type: '1', value: $event.key });
+              this.cursorIdx += 1;
+          }
+        }
+      },
+      watch: {
+        datalist: {
+          handler () {
+            console.log(this.datalist);
+          },
+          deep: true
+        }
+      }
     });
-    div.addEventListener('focus', ($event) => {
-      console.log($event);
-    });
 
-    let cursor = document.querySelector('.edit-cursor');
     setInterval(() => {
-      cursor.style.backgroundColor = cursor.style.backgroundColor == "rgb(255, 255, 255)" ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
-    }, 800);
+      let cursor = document.querySelector('.edit-cursor');
+      if (!cursor) return;
+      cursor.style.borderColor = cursor.style.borderColor == "rgb(255, 255, 255)" ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
+    }, 600);
   </script>
 </body>
 </html>
