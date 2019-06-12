@@ -73,6 +73,13 @@
     tabindex="0"
     @keyup="onKeyUp"
     @focus="onFocus">
+    <span
+      v-if="cursorIdx == 0"
+      class="edit-cursor-container">
+      {{ inPhrase }}
+      <span class="edit-cursor"></span>
+      <input type="text" id="inputbox" v-model="shadowPhrase" @keydown.prevent>
+    </span>
     <template v-for="(data, $index) in explodedlist">
       <span
         v-if="data.type == '1'"
