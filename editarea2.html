@@ -48,7 +48,9 @@
     
     .edit-cursor-container > input {
       position: absolute;
-      top: 32px;
+      left: 0px;
+      pointer-events: none;
+      opacity: 0;
     }
     .edit-cursor {
       position: absolute;
@@ -75,7 +77,7 @@
       <span
         v-if="data.type == '1'"
         @click="setCursor($index, $event)">
-        {{ data.value }}
+        {{ data.value == ' ' ? '&nbsp;' : data.value }}
       </span>
       <el-select
         v-if="data.type == '6'"
@@ -192,7 +194,13 @@
               this.inPhrase = '';
               break;
             case ' ':
-              this.appendText(this.shadowPhrase);
+              if (this.shadowPhrase.length > 0) {
+                this.appendText(this.shadowPhrase);
+              } else if (this.inPhrase.length > 0) {
+                this.appendText(this.inPhrase);
+              } else {
+                this.appendText(this.inPhrase + ' ');
+              }
               this.shadowPhrase = '';
               this.inPhrase = '';
               break;
