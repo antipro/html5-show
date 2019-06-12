@@ -74,7 +74,7 @@
     @keyup="onKeyUp"
     @focus="onFocus">
     <span
-      v-if="cursorIdx == 0"
+      v-if="editMode && cursorIdx == 0"
       class="edit-cursor-container">
       {{ inPhrase }}
       <span class="edit-cursor"></span>
@@ -97,7 +97,7 @@
       </el-select>
       <div class="br" v-if="data.type == '99'">&nbsp;</div>
       <span
-        v-if="$index + 1 == cursorIdx"
+        v-if="editMode && $index + 1 == cursorIdx"
         class="edit-cursor-container">
         {{ inPhrase }}
         <span class="edit-cursor"></span>
@@ -114,30 +114,35 @@
       },
       {
         type: '6',
-        dataValue: '1',
+        dataValue: '2',
         options: [
-          { id: '1', dataText: '测试1', dataValue: '1' },
-          { id: '2', dataText: '测试2', dataValue: '2' },
-          { id: '3', dataText: '测试3', dataValue: '3' }
+          { id: '1', dataText: '口干', dataValue: '1' },
+          { id: '2', dataText: '高热', dataValue: '2' },
+          { id: '3', dataText: '头痛', dataValue: '3' }
         ]
       },
       {
         type: '1',
-        value: '测试内容'
+        value: '5天'
       },
       {
         type: '6',
-        dataValue: '1',
+        dataValue: '3',
         options: [
-          { id: '1', dataText: '测试1', dataValue: '1' },
-          { id: '2', dataText: '测试2', dataValue: '2' },
-          { id: '3', dataText: '测试3', dataValue: '3' }
+          { id: '1', dataText: '左上腹', dataValue: '1' },
+          { id: '2', dataText: '右上腹', dataValue: '2' },
+          { id: '3', dataText: '左下腹', dataValue: '3' }
         ]
+      },
+      {
+        type: '1',
+        value: '疼痛'
       }
     ];
     const vueApp = new Vue({
       el: '.edit-area',
       data: {
+        editMode: false,
         shadowPhrase: '',
         inPhrase: '',
         datalist,
@@ -146,10 +151,6 @@
       },
       mounted () {
         this.cursorIdx = this.explodedlist.length;
-        console.log(this);
-        Vue.nextTick(() => {
-          document.querySelector('#inputbox').focus();
-        })
       },
       methods: {
         onKeyUp ($event) {
@@ -219,6 +220,7 @@
           })
         },
         onFocus () {
+          this.editMode = true;
           Vue.nextTick(() => {
             document.querySelector('#inputbox').focus();
           })
