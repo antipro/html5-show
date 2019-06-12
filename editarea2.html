@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdn.bootcss.com/vue/2.6.10/vue.js"></script>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <!-- 引入组件库 -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <title>Edit DIV</title>
+  <style>
+    .edit-area {
+      width: 99%;
+      min-height: 100px;
+      background-color: rgb(255, 255, 255);
+      border: 1px solid #000;
+      word-break: break-all;
+      overflow-y: auto;
+      overflow-x: hidden;
+      font-size: 2em;
+      padding: 5px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-wrap: wrap;
+      align-content: flex-start;
+    }
+    .edit-area:focus {
+      outline: 0px solid transparent;
+      border-color: #008080;
+    }
+    .edit-area > * {
+      margin: 1px;
+    }
+    .edit-cursor-container {
+      position: relative;
+      width: auto;
+      height: 32px;
+      border: none;
+      margin: 0;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      border-bottom: 1px dashed #000;
+    }
+    
+    .edit-cursor-container > input {
+      position: absolute;
+      top: 32px;
+    }
+    .edit-cursor {
+      position: absolute;
+      top: 0;
+      right: 1px;
+      height: 100%;
+      border: 1px solid #000;
+    }
+    .br {
+      flex-basis: 100%;
+      width: 0px; 
+      height: 0px; 
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div
+    class="edit-area"
+    tabindex="0"
+    @keyup="onKeyUp"
+    @focus="onFocus">
+    <template v-for="(data, $index) in explodedlist">
+      <span
+        v-if="data.type == '1'"
+        @click="setCursor($index, $event)">
+        {{ data.value }}
+      </span>
+      <el-select
+        v-if="data.type == '6'"
+        v-model="data.dataValue">
+        <el-option
+          v-for="option in data.options"
+          :key="option.id"
+          :label="option.dataText"
+          :value="option.dataValue">
+      </el-select>
+      <div class="br" v-if="data.type == '99'">&nbsp;</div>
+      <span
+        v-if="$index + 1 == cursorIdx"
+        class="edit-cursor-container">
+        {{ inPhrase }}
+        <span class="edit-cursor"></span>
+        <input type="text" id="inputbox" v-model="shadowPhrase" @keydown.prevent>
+      </span>
+    </template>
+  </div>
+  <input type="text" name="" id="">
+  <script>
+    const datalist = [
+      {
+        type: '1',
+        value: '患者'
+      },
+      {
+        type: '6',
+        dataValue: '1',
+        options: [
+          { id: '1', dataText: '测试1', dataValue: '1' },
+          { id: '2', dataText: '测试2', dataValue: '2' },
+          { id: '3', dataText: '测试3', dataValue: '3' }
+        ]
+      },
+      {
+        type: '1',
+        value: '测试内容'
+      },
+      {
+        type: '6',
+        dataValue: '1',
+        options: [
+          { id: '1', dataText: '测试1', dataValue: '1' },
+          { id: '2', dataText: '测试2', dataValue: '2' },
+          { id: '3', dataText: '测试3', dataValue: '3' }
+        ]
+      }
+    ];
+    const vueApp = new Vue({
+      el: '.edit-area',
+      data: {
+        shadowPhrase: '',
+        inPhrase: '',
+        datalist,
+        cursorIdx: 0,
+        inIdx: 0
+      },
+      mounted () {
+        this.cursorIdx = this.explodedlist.length;
+        console.log(this);
+        Vue.nextTick(() => {
+          document.querySelector('#inputbox').focus();
+        })
+      },
+      methods: {
+        onKeyUp ($event) {
+          console.log($event, this.dataIdx, this.inIdx);
+          switch($event.key) {
+            case 'Backspace':
+              if (this.inPhrase.length > 0) {
+                this.inPhrase = this.inPhrase.substr(0, this.inPhrase.length - 1);
+                break;
+              }
+              if (this.cursorIdx != 0) {
+                let data = this.datalist[this.dataIdx];
+                if (data.type == '1' && data.value.length > 1) {
+                  let chars = data.value.split('');
+                  chars.splice(this.inIdx, 1);
+                  data.value = chars.join('');
+                } else {
+                  this.datalist.splice(this.dataIdx, 1);
+                }
+                this.cursorIdx -= 1;
+              }
+              break;
+            case 'Shift': // ignore
+              break;
+            case 'Control': // ignore
+              break;
+            case 'Alt': // ignore
+              break;
+            case 'ArrowUp':
+              break;
+            case 'ArrowDown':
+              break;
+            case 'ArrowLeft':
+              this.cursorIdx -= 1;
+              if (this.cursorIdx < 0) this.cursorIdx = 0;
+              break;
+            case 'ArrowRight':
+              this.cursorIdx += 1;
+              if (this.cursorIdx > this.explodedlist.length) this.cursorIdx = this.explodedlist.length;
+              break;
+            case 'Enter':
+              if (this.inPhrase.length == 0) {
+                this.datalist.push({ type: '99' });
+                this.cursorIdx += 1;
+              } else {
+                this.appendText(this.inPhrase);
+              }
+              this.shadowPhrase = '';
+              this.inPhrase = '';
+              break;
+            case ' ':
+              this.appendText(this.shadowPhrase);
+              this.shadowPhrase = '';
+              this.inPhrase = '';
+              break;
+            default:
+              this.inPhrase += $event.key;
+          }
+          Vue.nextTick(() => {
+            document.querySelector('#inputbox').focus();
+          })
+        },
+        onFocus () {
+          Vue.nextTick(() => {
+            document.querySelector('#inputbox').focus();
+          })
+        },
+        onInput ($event) {
+          if ($event.keyCode == 13) {
+            $event.preventDefault();
+            this.appendText($event.target.innerText);
+            $event.target.innerText = '';
+            return;
+          }
+        },
+        setCursor ($index, $event) {
+          this.shadowPhrase = '';
+          if ($event.offsetX > $event.target.scrollWidth / 2) {
+            this.cursorIdx = $index + 1;
+          } else {
+            this.cursorIdx = $index;
+          }
+          Vue.nextTick(() => {
+            document.querySelector('#inputbox').focus();
+          })
+        },
+        appendText (text) {
+          let data = this.datalist[this.dataIdx];
+          if (data && data.type == '1') {
+            let chars = data.value.split('');
+            chars.splice(this.inIdx + 1, 0, text);
+            data.value = chars.join('');
+          } else {
+            this.datalist.splice(this.dataIdx + 1, 0, { type: '1', value: text });
+          }
+          this.cursorIdx += text.length;
+        }
+      },
+      computed: {
+        explodedlist () {
+          let explodedlist = [];
+          this.datalist.forEach((data, idx) => {
+            if (data.type == '1') {
+              let chars = data.value.split('').map((char, charIdx) => {
+                return { type: '1', value: char, ref: data, charIdx };
+              });
+              explodedlist.push(...chars);
+            } else {
+              explodedlist.push(data);
+            }
+          });
+          return explodedlist;
+        },
+        dataIdx () {
+          let idx = 0;
+          return this.datalist.findIndex(data => {
+            let length;
+            if (data.type == '1') {
+              length = data.value.length;
+            } else {
+              length = 1;
+            }
+            idx += length;
+            if (idx >= this.cursorIdx) {
+              this.inIdx = length - (idx - this.cursorIdx) - 1
+              return true; 
+            };
+          });
+        }
+      },
+      watch: {
+        datalist: {
+          handler () {
+            console.log(this.datalist);
+          },
+          deep: true
+        }
+      }
+    });
+
+    setInterval(() => {
+      let cursor = document.querySelector('.edit-cursor');
+      if (!cursor) return;
+      cursor.style.borderColor = cursor.style.borderColor == "rgb(255, 255, 255)" ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
+    }, 600);
+  </script>
+</body>
+</html>
